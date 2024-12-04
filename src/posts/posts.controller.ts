@@ -28,6 +28,11 @@ export class PostsController {
     return this.postsService.findOne(id);
   }
 
+  @Get('/with-comments/:id')
+  getOneWithComments(@Param('id') id: number) {
+    return this.postsService.findOneWithComments(id);
+  }
+
   @UseGuards(AuthGuard)
   @Post()
   createPost(@Body() data: CreatePostDto, @Request() req) {

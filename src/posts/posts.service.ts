@@ -38,6 +38,20 @@ export class PostsService {
     return post;
   }
 
+  async findOneWithComments(id: number): Promise<Post> {
+    const post = await this.postsRepository
+      .createQueryBuilder('post')
+      .leftJoinAndSelect('post.comments', 'comments')
+      .where('post.id = :id', { id })
+      .getOne();
+    if (!post) {
+      throw new NotFoundException('INVALID POST', {
+        description: 'Post not found',
+      });
+    }
+    return post;
+  }
+
   create(data: CreatePostDto, userId: number): Promise<Post> {
     const newPost = new Post();
     newPost.userId = userId;
