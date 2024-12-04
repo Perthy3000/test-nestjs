@@ -4,7 +4,9 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
+import { Comment } from './comment.entity';
 
 @Entity()
 export class Post {
@@ -22,6 +24,9 @@ export class Post {
 
   @Column()
   tag: string;
+
+  @OneToMany(() => Comment, (comment) => comment.post)
+  comments: Comment[];
 
   @CreateDateColumn()
   createdAt: Date;

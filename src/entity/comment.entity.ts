@@ -4,7 +4,9 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
 } from 'typeorm';
+import { Post } from './post.entity';
 
 @Entity()
 export class Comment {
@@ -14,8 +16,8 @@ export class Comment {
   @Column()
   userId: number;
 
-  @Column()
-  postId: number;
+  @ManyToOne(() => Post, (post) => post.comments)
+  post: Post;
 
   @Column()
   content: string;

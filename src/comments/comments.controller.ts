@@ -20,7 +20,7 @@ export class CommentsController {
 
   @Get(':postId')
   findCommentsByPostId(@Param('postId') postId: number) {
-    return this.commentsService.findPostCommen(postId);
+    return this.commentsService.findPostComment(postId);
   }
 
   @UseGuards(AuthGuard)

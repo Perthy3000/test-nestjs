@@ -5,26 +5,41 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Comment } from 'src/entity/comment.entity';
-import { DeleteResult, Repository } from 'typeorm';
+import { DataSource, DeleteResult, Repository } from 'typeorm';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
+import { Post } from 'src/entity/post.entity';
 
 @Injectable()
 export class CommentsService {
   constructor(
     @InjectRepository(Comment)
     private commentsRepository: Repository<Comment>,
+    private dataSource: DataSource,
   ) {}
 
-  findPostCommen(postId: number): Promise<Comment[]> {
-    return this.commentsRepository.findBy({ postId });
+  findPostComment(postId: number): Promise<Comment[]> {
+    return this.commentsRepository.findBy({ post: { id: postId } });
   }
 
-  createComment(data: CreateCommentDto, userId: number): Promise<Comment> {
+  async createComment(
+    data: CreateCommentDto,
+    userId: number,
+  ): Promise<Comment> {
+    const post = await this.dataSource
+      .getRepository(Post)
+      .findOneBy({ id: data.postId });
+
+    if (!post) {
+      throw new BadRequestException('INVALID DATA', {
+        description: 'Post not found',
+      });
+    }
+
     const newComment = new Comment();
     newComment.userId = userId;
     newComment.content = data.content;
-    newComment.postId = data.postId;
+    newComment.post = post;
 
     return this.commentsRepository.save(newComment);
   }

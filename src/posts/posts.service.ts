@@ -17,11 +17,19 @@ export class PostsService {
   ) {}
 
   findAll(): Promise<Post[]> {
-    return this.postsRepository.find();
+    return this.postsRepository
+      .createQueryBuilder('post')
+      .loadRelationCountAndMap('post.commentsCount', 'post.comments')
+      .getMany();
   }
 
   async findOne(id: number): Promise<Post> {
-    const post = await this.postsRepository.findOneBy({ id });
+    const post = await this.postsRepository
+      .createQueryBuilder('post')
+      // .leftJoinAndSelect('post.comments', 'comment')
+      .loadRelationCountAndMap('post.commentsCount', 'post.comments')
+      .where('post.id = :id', { id })
+      .getOne();
     if (!post) {
       throw new NotFoundException('INVALID POST', {
         description: 'Post not found',
